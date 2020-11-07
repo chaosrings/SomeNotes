@@ -38,14 +38,29 @@ $L_o=\int_{l \in w_l} f_{brdf}(l,v)L_l(n ·l)^+dl$
 $L_o \approx \pi f_{brdf}(n ·l)^+c_{light}$
 
 
-这个近似方案必然是有误差的，因为面积光源与物体表面点的立体角并不是精确光源那种理想化的极小值。不过这个误差可以把控，其主要受两个因素影响：一为源与物体表面点的立体角，二为物体表面的粗糙度，因此，我们可以在仅用精确光源的情况下通过增加物体表面粗糙度来模拟物体被面积光源照射的结果：
+这个近似方案必然是有误差的，因为面积光源与物体表面点的立体角并不是精确光源那种理想化的极小值。不过这个误差可以人为把控，其主要受两个因素影响：一为源与物体表面点的立体角，二为物体表面的粗糙度，因此，我们可以在仅用精确光源的情况下通过增加物体表面粗糙度来模拟物体被面积光源照射的结果：
 
 ![roughsurface](LocalIllumination/PunctualLightRoughnessSurface.png)
 
-不过对于特例理想漫反射表面-Lambertian，用精确光源来替换面积光源是精确的(?这里不还是有个近似吗)，其出射radiance可以通过iradiance得到：
+对于理想漫反射表面-Lambertian，用精确光源来替换面积光源是不会引入误差的，其出射radiance可以通过iradiance得到：
 
 $L_o(v)=\frac{\rho_{ss}}{\pi}E$
 
 $\rho_{ss}$是表面材质属性中的反照率，irradiance $E$则可以通过积分计算：
 
 $E=\int_{l\in w_l} L_l(n·l)^+dl \approx \pi c_{light}(n·l_c)^+$
+
+综合一下的话，也就是
+
+$L_o(v)=c_{light}\rho_{ss} (n·l_c)^+$
+
+也就是
+
+```CG
+
+diffColor=lightColor*albedo*max(0,dot(n,l))
+
+```
+
+## 光泽表面
+
