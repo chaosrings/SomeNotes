@@ -1,14 +1,15 @@
 ---
-title: LocalIllumination
+title: PunctualAndAreaLightSource
 date: 2020-11-01 11:40:14
-categories: shading model
-tags: 局部光照
+categories: 
+- light source
+tags: 
+- 精确光源
+- 面积光源
 ---
-## 局部光照
 
-局部光照指的是只考虑光源与物体表面交互的着色模型，不包含物体间的相互遮挡以及间接光照，可以理解为在局部光照的着色过程中，场景只有着色点与光源两个物体。在实时渲染中，光源大概可分为点光源，面积光，方向光，环境光这几种：
 
-### 精确光源(Punctual Light Source)
+## 精确光源(Punctual Light Source)
 
 ![punctual](LocalIllumination/PunctualAndArea.png)
 
@@ -28,7 +29,7 @@ $\int_\Omega f_{brdf}(l,v)L_c(n ·l)^+d\omega=\lim_{\Omega \to 0}\int_\Omega f_{
 
 $L_o=f_{brdf}(n ·l)^+lim_{\Omega \to 0}\int_\Omega L_cd\omega=\pi f_{brdf}(n ·l)^+c_{light}$
 
-### 面积光(Area Light Source)
+## 面积光(Area Light Source)
 面积光源则是在立体角$w_l$内有恒定的入射radiance $L_l$的光源，其对出射光方向$v$的radiance贡献则是在这个立体角范围内的积分：
 
 $L_o=\int_{l \in w_l} f_{brdf}(l,v)L_l(n ·l)^+dl$
@@ -42,7 +43,7 @@ $L_o \approx \pi f_{brdf}(n ·l)^+c_{light}$
 
 ![roughsurface](LocalIllumination/PunctualLightRoughnessSurface.png)
 
-#### 漫反射表面的面积光着色
+### 漫反射表面的面积光着色
 
 对于理想漫反射表面-Lambertian，用精确光源来替换面积光源是不会引入误差的，其出射radiance可以通过iradiance得到：
 
@@ -64,7 +65,7 @@ lightDiff=lightColor*albedo*max(0,dot(n,l))
 
 ```
 
-#### 光泽表面的面积光着色
+### 光泽表面的面积光着色
 
 对光泽表面而言，最重要的视觉效果便是高光，我们在现实中可以观察到光泽表面的高光区域形状和大小与面积光源的形状大小类似，而其边缘会随着物体表面的粗糙度变化而有不同程度的模糊，这个现象引出了一些经验模型来近似面积光的照射结果。
 
