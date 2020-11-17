@@ -45,7 +45,7 @@ $L_o \approx \pi f_{brdf}(n ·l)^+c_{light}$
 
 ### 漫反射表面的面积光着色
 
-对于理想漫反射表面-Lambertian，用精确光源来替换面积光源是不会引入误差的，其出射radiance可以通过iradiance得到：
+对于理想Lambertian漫反射表面，用点光源来替换面积光源是不会引入误差的，其出射radiance可以通过iradiance得到：
 
 $L_o(v)=\frac{\rho_{ss}}{\pi}E$
 
