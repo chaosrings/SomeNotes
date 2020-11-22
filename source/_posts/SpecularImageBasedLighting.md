@@ -64,7 +64,7 @@ float3 PrefilterEnvMap( float Roughness, float3 R )
 
 float3 PrefilterEnvMap( float Roughness, float3 R,float3 N,float V)
 
-为了简化计算只能假定$N=V=R$，这个计算过程大致的思路是对法线方向用GGX分布进行重要性采样得到中间向量$H$，用向量$H$计算视线向量$V$的反射向量$L$，所有采样点计算生成的$L$向量也就构成了在指定粗糙度(Roughness)和反射方向(R)的Specular Lobe，用$L$从EnvMap中取值平均，就得到了第一个积分式的结果。
+为了简化计算只能假定$N=V=R$，这个计算过程大致的思路是对法线方向用GGX分布进行重要性采样得到中间向量$H$，基于向量$H$计算视线向量$V$的反射向量$L$，所有采样点计算生成的$L$向量也就构成了在指定粗糙度(Roughness)和反射方向(R)的Specular Lobe，用$L$从EnvMap中取值平均，就得到了第一个积分式的结果。
 
 第二个积分式，
 
