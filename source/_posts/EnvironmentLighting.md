@@ -29,12 +29,18 @@ L_ambient=Light_ambient*ambientColor
 
 ## Radiance Varying Light
 
-区别于常量radiance的ambient light，另一种环境光形式则是radiance会随着方向变化。这种光源的radiance不是一个简单的数值，而是一个关于方向的函数。这个函数通常没有解析解(可以设想如何用一个函数表达式来描述大气层在照亮地面时的radiance)。因此，要在渲染中应用这种环境光，需要使用数值解，或是用函数近似。
+区别于常量radiance的ambient light，另一种环境光形式则是radiance会随着方向变化。这种光源的radiance不是一个简单的数值，而是一个关于方向的函数。这个函数通常没有解析解(可以设想如何用一个函数表达式来描述大气层在照亮地面时的radiance)。因此，要在渲染中应用这种环境光，需要使用数值解，或是用函数近似的方式来实现。
 
-### Simple Tabulated Forms
+### Environment Mapping 
 
-最简单直接的方式就是选取一些方向的数值存储在表中，不在表中方向的函数值则进行插值求解，简单粗暴易于理解。这种方式主要用于存储复杂的高频光照信息，当我们需要的环境光没有那么多高频信息时候，可以考虑利用函数近似的方法。
+将一个球面radiance函数记录在Texture上的方式也就是EnvironmentMapping了，是实时渲染中最常见的环境光表示方式。EnvironmentMapping优势在于简单高效，并且可以表示任意高频的radiance。因此，在需要渲染光泽材质时，就可以用EnvironmentMapping来记录周围环境的radiance信息，着色时只需要在着色点计算视线基于着色点法线的反射向量，在贴图中采样就能得到入射的radiance，也就是：
 
-### Projection 
+$r=2(n·v)n-v$
 
-拟合一个函数的方法有很多种，函数定义在实数域可以用多项式拟合，分段拟合...对定义在单位球面$R^3$上的函数，常用的方法是将函数投影到球谐基上，存储少量球谐系数来近似目标函数(参见SphericalHarmonics XD)。这个方法的优势在于相比存数值查表，所需要的存储空间极少，只需要几个球谐系数。不过，用此方法会丢失一些高频的信息，存储的系数越少，丢失的信息越多。
+$L_i(v)=Sampler(EnvMapping,r)$
+
+Specular Image-Based Lighting就是基于此实现的。
+
+### SphericalHarmonics 
+
+另外一种方式就是将环境光照投影到球谐函数，对于比较低频的光照信息，可以通过存储少量球谐系数来近似目标函数(参见SphericalHarmonics XD)。这个方法的优势在于相比EnvironmentMapping，所需要的存储空间极少。
