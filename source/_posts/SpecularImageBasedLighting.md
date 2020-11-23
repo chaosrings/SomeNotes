@@ -18,7 +18,7 @@ Environment Map原本用于渲染镜面反射（roughness=0），经过一些改
 
 ![SpecularLobe](SpecularImageBasedLighting/SpecularLobe.png)
 
-不过这样一来就会有多个参数共同控制Specular Lobe的形状，为每个参数存储一个预处理过的贴图是不现实的。因此，在实际应用中需要假设BRDF独立于视线方向和法线方向(各向同性？)，这样就只需要选择不同粗糙度预计算几张环境贴图，并在实时渲染中选取合适粗糙度的贴图使用。这个结构和GPU的MipMap十分贴合，现在的实现也都是用不同级的MipMap存储粗糙度不同的贴图。
+不过这样一来就会有多个参数共同控制Specular Lobe的形状，为每个参数存储一个预处理贴图是不现实的。因此在实际应用时需要对视线方向和法线方法做一些假设，这样预处理时就只需要给定不同粗糙度预计算生成环境贴图，并在实时渲染中根据粗糙度选取合适的贴图使用。这个结构和GPU的MipMap十分贴合，现在的实现也都是用不同级的MipMap存储粗糙度不同的贴图。
 
 ![MipMap](SpecularImageBasedLighting/MipMap.png)
 
