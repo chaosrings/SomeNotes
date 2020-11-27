@@ -2,10 +2,8 @@
 title: EnvironmentLighting
 date: 2020-11-17 23:39:03
 categories: 
-- light source
 - Local Illumination
 tags: 
-- 环境光照
 ---
 
 环境光与面积光方向光类似，也是一种直接光照模型。

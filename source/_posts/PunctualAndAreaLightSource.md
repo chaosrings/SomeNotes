@@ -2,10 +2,8 @@
 title: PunctualAndAreaLightSource
 date: 2020-11-01 11:40:14
 categories: 
-- light source
+- Local Illumination
 tags: 
-- 精确光源
-- 面积光源
 ---
 
 
