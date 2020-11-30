@@ -1,6 +1,6 @@
 ---
 title: PunctualAndAreaLightSource
-date: 2020-11-01 11:40:14
+date: 
 categories: 
 - Local Illumination
 tags: 

@@ -1,6 +1,6 @@
 ---
 title: EnvironmentLighting
-date: 2020-11-17 23:39:03
+date: 
 categories: 
 - Local Illumination
 tags: 

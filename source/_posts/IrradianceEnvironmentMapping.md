@@ -1,6 +1,6 @@
 ---
 title: IrradianceEnvironmentMapping
-date: 2020-11-24 23:18:19
+date: 
 categories:
 - Local Illumination
 tags:

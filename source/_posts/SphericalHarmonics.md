@@ -1,7 +1,7 @@
 ---
 layout: cgmath
 title: 球谐函数
-date: 2020-10-31 15:44:13
+date: 
 categories: 
 - cgmath
 tags: 
