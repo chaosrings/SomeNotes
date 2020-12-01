@@ -12,7 +12,9 @@ tags:
 
 简单来说就是将场景中的物体分为static和dynamic两类，static物体与光源以及其余static物体会在实时渲染之前使用离线渲染的算法预先计算好正确的光照交互的结果（通常是缓存Irrdiance），实时渲染时只需要取出结果与表面材质进行计算。dynamic物体则还是使用LocalIllumination的模型进行光照计算，也可以使用一些近似算法来得到不那么PhysicallyBased的光照结果。
 
-Unity的LightMap原理应该就是这样,可以参考shader中对LightMap的使用：
+![lightMap](DiffuseGlobalIllumination/LightMap.png)
+
+Unity的LightMap原理便是如此,可以参考shader中对LightMap的使用：
 
 ```CG
 float4 albedo=tex2D(_MainTex,i.uv);
