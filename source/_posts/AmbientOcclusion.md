@@ -6,7 +6,7 @@ categories:
 tags:
 ---
 
-环境光遮蔽的原理可以直接从渲染方程推导出来，对Lambertian表面，任意一个着色点p的渲染结果$L_o$是$\frac{c_{albedo}}{\pi}$和Irrdiance的乘积，若假设在此着色点p的所有入射方向radiance为一常量$L_A$，最简单的环境光就是这种形式，那么该点接受的Irrdiance就为
+环境光遮蔽的原理可以直接从渲染方程推导出来，对Lambertian表面，任意一个着色点p的渲染结果$L_o$是$\frac{c_{albedo}}{\pi}$和Irrdiance的乘积，若假设在此着色点p的所有入射方向radiance为一常量$L_A$，也就是最简单的环境光Ambient Light，那么该点接受的Irrdiance就为
 
 $E(p,n)=\int_{l \in \Omega}L_A (n·l)^+dl=\pi L_A$
 
@@ -68,12 +68,12 @@ $k_A^·=\frac{k_A}{1-c_{albedo}(1-k_A)}$
 
 ### Precomputed 
 
-其实就是算一个数值积分式，又可以用到老朋友蒙特卡洛积分了：
+其实就是算一个数值积分式，可以通过蒙特卡洛方法进行数值积分运算：
 
 $k_A=\frac{1}{N}\sum_i^N v(l_i)(n·l_i)^+$
 
-通过此式对要着色的物体的顶点生成ao值存放在贴图中，渲染时就可以直接从贴图中取值使用了。
+通过此式对要着色的物体的顶点生成ao值存放在贴图中，渲染时就可以直接从贴图中取值即可。
 
 ### Dynamic Computation
 
-比较基础且常见的就是SSAO了，以及其系列的衍生算法）
+比较基础且常见的就是SSAO了，以及其系列的衍生算法如HBAO...，这类算法的特点在于不那么物理正确，但在实时渲染中消耗较低，并且效果还算不错。后续该实现一下SSAO)
