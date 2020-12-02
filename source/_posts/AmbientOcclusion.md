@@ -6,11 +6,11 @@ categories:
 tags:
 ---
 
-环境光遮蔽的原理可以直接从渲染方程推导出来，对Lambertian表面，任意一个着色点p的渲染结果$L_o$是$\frac{c_{albedo}}{\pi}$和Irrdiance的乘积，若假设在此着色点p的所有入射方向radiance为一常量$L_A$，也就是最简单的环境光Ambient Light，那么该点接受的Irrdiance就为
+环境光遮蔽的原理可以直接从渲染方程推导出来，对Lambertian表面，任意一个着色点p的渲染结果$L_o$是$\frac{c_{albedo}}{\pi}$和Irradiance的乘积，若假设在此着色点p的所有入射方向radiance为一常量$L_A$，也就是最简单的环境光Ambient Light，那么该点接受的Irradiance就为
 
 $E(p,n)=\int_{l \in \Omega}L_A (n·l)^+dl=\pi L_A$
 
-积分结果十分简单，不过有一些缺陷，这里并未考虑到着色点会被本模型的面片以及场景中其他模型面片的遮挡，若简单的假设面片被遮挡的方向入射radiance是0（实际上不是，有间接光照），未被遮挡的方向为$L_A$,设可见函数$v(p,l)$表明p点的l入射方向是否被遮挡，遮挡为0反之为1，那么Irrdiance的积分就可以表示为：
+积分结果十分简单，不过有一些缺陷，这里并未考虑到着色点会被本模型的面片以及场景中其他模型面片的遮挡，若简单的假设面片被遮挡的方向入射radiance是0（实际上不是，有间接光照），未被遮挡的方向为$L_A$,设可见函数$v(p,l)$表明p点的l入射方向是否被遮挡，遮挡为0反之为1，那么Irradiance的积分就可以表示为：
 
 $E(p,n)=L_A\int_{l \in \Omega}v(p,l)(n·l)^+dl$
 
@@ -18,7 +18,7 @@ $E(p,n)=L_A\int_{l \in \Omega}v(p,l)(n·l)^+dl$
 
 $k_A(p)=\frac{1}{\pi}\int_{l \in \Omega}v(p,l)(n·l)^+dl$
 
-着色点的Irrdiance就可以写成：
+着色点的Irradiance就可以写成：
 
 $E(p,n)=\pi K_AL_A$
 
