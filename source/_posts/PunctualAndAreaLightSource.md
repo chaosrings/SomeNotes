@@ -9,7 +9,7 @@ tags:
 
 ## 精确光源(Punctual Light Source)
 
-![punctual](LocalIllumination/PunctualAndArea.png)
+![punctual](PunctualAndAreaLightSource/PunctualAndArea.png)
 
 精确光源定义为立体角无限小的球面光源。在这无限小的立体角中，光线的radiance为$L_c$，定义其光源的颜色$c_{light}$为其垂直照射在反照率为$(1,1,1)$的Lambertian表面所得到的出射光radiance，即
 
@@ -39,7 +39,7 @@ $L_o \approx \pi f_{brdf}(n ·l)^+c_{light}$
 
 这个近似方案必然是有误差的，因为面积光源与着色点的立体角并不是精确光源那种理想化的极小值。不过这个误差可以人为把控，其主要受两个因素影响：一为源与物着色点的立体角，二为物体表面的粗糙度，因此，我们可以在仅用精确光源的情况下通过增加表面粗糙度来模拟面积光源照射的结果：
 
-![roughsurface](LocalIllumination/PunctualLightRoughnessSurface.png)
+![roughsurface](PunctualAndAreaLightSource/PunctualLightRoughnessSurface.png)
 
 ### 漫反射表面的面积光着色
 
@@ -75,7 +75,7 @@ $\alpha_g^·=(\alpha_g+\frac{r_l}{|p_l-p|})$
 
 另一种近似方法则是修正着色点到光源的向量，例如，球面光源可以选取距离视线反射向量最近的点代表整个光源，与着色点之间的向量作为光源向量参与计算：
 
-![MRP](LocalIllumination/MostRepresentativePoint.png)
+![MRP](PunctualAndAreaLightSource/MostRepresentativePoint.png)
 
 设着色点为$p_{shade}$，那么修正后的光源向量$l_{light}=p_{cs}-p_{shade}$
 
@@ -85,6 +85,6 @@ $\alpha_g^·=(\alpha_g+\frac{r_l}{|p_l-p|})$
 
 对于光照而言，函数f(x)为$f(x)=f_{brdf}(l,v)L_i(n·l)^+$,区域D则是着色点上半球面中面积光源与着色点形成的立体角。
 
-![GlossySurfaceAreaLight](LocalIllumination/GlossySurfaceAreaLight.png)
+![GlossySurfaceAreaLight](PunctualAndAreaLightSource/GlossySurfaceAreaLight.png)
 
 从左到右依次为数值积分，修正粗糙度，修正光源向量的渲染结果。
