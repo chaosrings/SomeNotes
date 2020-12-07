@@ -3,7 +3,7 @@ title: SpecularImageBasedLighting
 date: 
 categories:
 - Local Illumination
-tags:
+mathjax: true
 ---
 
 Environment Map原本用于渲染镜面反射（roughness=0），经过一些改造，也能够用于渲染粗糙度不为0的光泽表面。

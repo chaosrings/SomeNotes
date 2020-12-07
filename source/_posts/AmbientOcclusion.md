@@ -4,6 +4,7 @@ date:
 categories:
 - Global Illumination
 tags:
+mathjax: true
 ---
 
 环境光遮蔽的原理可以直接从渲染方程推导出来，对Lambertian表面，任意一个着色点p的渲染结果$L_o$是$\frac{c_{albedo}}{\pi}$和Irradiance的乘积，若假设在此着色点p的所有入射方向radiance为一常量$L_A$，也就是最简单的环境光Ambient Light，那么该点接受的Irradiance就为

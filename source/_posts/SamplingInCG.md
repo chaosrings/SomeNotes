@@ -4,6 +4,7 @@ date:
 categories:
 - cgmath
 tags:
+mathjax: true
 ---
 
 ## Inverse Transform Sampling

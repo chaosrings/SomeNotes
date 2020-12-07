@@ -4,6 +4,7 @@ date:
 categories: 
 - Local Illumination
 tags: 
+mathjax: true
 ---
 
 环境光与面积光方向光类似，也是一种直接光照模型。

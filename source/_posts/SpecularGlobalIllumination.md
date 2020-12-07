@@ -3,7 +3,7 @@ title: SpecularGlobalIllumination
 date: 
 categories:
 - Global Illumination
-tags:
+mathjax: true
 ---
 
 镜面材质的全局光照实现方式大致也可以分为预计算和近似计算两种实现方式。

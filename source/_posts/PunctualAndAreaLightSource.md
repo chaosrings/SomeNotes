@@ -4,6 +4,7 @@ date:
 categories: 
 - Local Illumination
 tags: 
+mathjax: true
 ---
 
 

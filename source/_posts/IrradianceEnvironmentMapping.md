@@ -4,6 +4,7 @@ date:
 categories:
 - Local Illumination
 tags:
+mathjax: true
 ---
 
 EnvMap不仅能用于光泽反射表面的着色，也可以对漫反射表面着色。相比用来渲染光泽表面的EnvMap存储radiance数值，通过视线反射向量来索引取值，用来渲染漫反射表面的EnvMap存储的是irradiance数值，通过着色点的法线来索引取值。
