@@ -3,7 +3,6 @@ title: DiffuseGlobalIllumination
 date: 
 categories:
 - Global Illumination
-tags:
 mathjax: true
 ---
 

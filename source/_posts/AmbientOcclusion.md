@@ -3,7 +3,6 @@ title: AmbientOcclusion
 date: 
 categories:
 - Global Illumination
-tags:
 mathjax: true
 ---
 

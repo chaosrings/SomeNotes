@@ -1,5 +1,4 @@
 ---
-layout: cgmath
 title: 球谐函数
 date: 
 categories: 

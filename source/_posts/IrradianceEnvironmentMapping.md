@@ -3,7 +3,6 @@ title: IrradianceEnvironmentMapping
 date: 
 categories:
 - Local Illumination
-tags:
 mathjax: true
 ---
 

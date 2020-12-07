@@ -3,7 +3,6 @@ title: SamplingInCG
 date: 
 categories:
 - cgmath
-tags:
 mathjax: true
 ---
 
