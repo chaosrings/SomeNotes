@@ -32,8 +32,8 @@ d.In-scattering
 
 消亡系数$\sigma_t=\sigma_s(Out-scattering)+\sigma_a$可以用来描述被消耗比率。
 
-反照率$\rho=\frac{\sigma_s}{\sigma_s+\sigma_a}=\frac{\sigma_s}{\sigma_t}$
+反照率定义为$\rho=\frac{\sigma_s}{\sigma_s+\sigma_a}=\frac{\sigma_s}{\sigma_t}$，反照率接近0时意味着光子几乎都是被介质吸收，像发电厂排放的黑烟就是这类介质，反照率为1意味着与介质接触的大部分光子都是被散射而不是被吸收，像云和大气就是这列介质。
 
-辐射传输函数$L(x,v)$定义在空间中点$x$方向为$v$的radiance。
+辐射传输函数$L(x,v)$定义为在空间中点$x$方向为$v$的radiance。
 
 
