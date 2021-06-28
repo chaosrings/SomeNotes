@@ -14,7 +14,7 @@ SD主要用于生成程序化的纹理贴图，在广泛使用的PBR着色模型
 
 ![](SubstanceExplorer/SDOutput.png)
 
-与虚幻引擎的Metallic/Roughness工作流可以完美对接。
+分别是基础色、法线贴图、粗糙度和金属度，与虚幻引擎的Metallic/Roughness工作流可以完美对接。
 
 SD的工作内容就是用数据流编程的方式来生成这些贴图，工具默认提供了很多方便使用的节点:
 
@@ -30,15 +30,15 @@ SD的工作内容就是用数据流编程的方式来生成这些贴图，工具
 
 ![](SubstanceExplorer/SDNodeTileTrans.png)
 
-另一类则是操作节点，可以理解为都是Pixel Processor的子类：
+另一类则是运算节点，可以理解为都是Pixel Processor的子类：
 
 ![](SubstanceExplorer/SDNodePS.png)
 
 Pixel Processor与渲染中的Fragment Shader十分类似，都是对所有像素执行一个函数，并输出结果。
 
 ```
-foreach pixel in graph
-    pixel_out = ProcessFunc(pixel)
+foreach pixel_in in input
+    pixel_out = ProcessFunc(pixel_in1,pixel_in2...)
 ```
 
 以节点Blend为例:
@@ -59,9 +59,31 @@ ProcessFunc = Background op (Foreground * Opacity)
 
 $P^·=Matrix_{transform} · P$
 
-这些节点类似于编程语言中的各种原子操作，有了这些基础的节点，就可以组合的方式来实现各种纹理的生成。
+这些节点类似于编程语言中的各种原子操作，实现这些基本原子后，就可以组合实现各种纹理。
 
 以一个最简单的金属材质为例：
 
 ![](SubstanceExplorer/SDMetalGraph.png)
 
+这些节点组合就会生成这样一张污渍被刮花的金属贴图：
+
+![](SubstanceExplorer/SDOutputMetal.png)
+
+基础色直接用金属的颜色与噪声图进行混合，看起来就像是金属被氧化了。法线贴图则是用进行一些加减操作后的高度图来实现指定形状的图案。粗糙度贴图则是由一张噪声贴图减去高度图，这样做的话金属突出的部分粗糙度较低，比较符合暴露在外的金属经常被摩擦污渍较少，同时噪声中黑色的部分粗糙度也比较低，看起来就像是污渍被清掉了。
+
+这些数据流图也可以简单的用几句代码来描述：
+
+```
+distanceMap = DistanceMap(TileGenerator)
+rotate45 = rotate(distanceMap)
+rotate_45 = rotate("distanceMap)
+detailMap = max(rotate45-rotate_45,0)
+
+BaseColor = noise1*uniformColor*opacity;
+Normal = detailMap
+Roughness = noise2-detailMap*opacity
+Metallic = 1
+
+```
+
+//TODO use in ue and unity
