@@ -86,4 +86,33 @@ Metallic = 1
 
 ```
 
-//TODO use in ue and unity
+## 配合游戏引擎使用
+
+因为Unity2017和SD配合得不太好，最近也在学习UE相关知识，就用UE来配合使用了。
+
+SD中可以选择暴露想要在引擎里调节的参数：
+
+![](SubstanceExplorer/SDExposeParam.png)
+
+导出sbsar到引擎中就可以任意改变这个参数来生成不同的纹理：
+
+![](SubstanceExplorer/UEParam.png)
+
+下面就是distance参数被分别设置成1和3的结果。
+
+![](SubstanceExplorer/SDD3.png) 
+
+![](SubstanceExplorer/SDD1.png)
+
+## 一些思考
+
+Node-Based的图形化编程被广泛用于游戏开发的各个过程中，程序化内容生成工具如Houdini,Substance Designer都是基于此，游戏引擎中UE的材质编辑器和蓝图，Unity的ShaderGraph也都是用连连看的方式来实现功能。一方面图形化编程降低了门槛，不需要了解编程知识也可以做实际上写代码的工作，另一方面图形化后逻辑的可读性以及可维护性应该是不如程序代码的。
+曾经在网上看到过这样精美的程序化纹理：
+
+![](SubstanceExplorer/SDComplexGraphOut.png)
+
+然而它的SD节点图是这样的：
+
+![](SubstanceExplorer/SDComplexGraphNodes.png)
+
+将一些通用逻辑封装成块，或者用代码实现是不是更好的选择？
