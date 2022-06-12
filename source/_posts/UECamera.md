@@ -42,9 +42,9 @@ struct FTViewTarget
 
 ## CameraComponent
 
-![](UE4Camera/CameraComponent.png)
+![](UECamera/CameraComponent.png)
 
-CameraComponent提供了一个POV,一般而言作为ViewTargetCameraComponent的Location,Rotation,FOV等属性会直接传递给POV,可以看CameraComponet::GetCameraView()的实现:
+CameraComponent提供了一个POV,一般而言作为ViewTarget的CameraComponent Location,Rotation,FOV等属性会直接传递给POV,可以看CameraComponet::GetCameraView()的实现:
 
 ```cpp
 void UCameraComponent::GetCameraView(float DeltaTime, FMinimalViewInfo& DesiredView)
@@ -59,11 +59,13 @@ void UCameraComponent::GetCameraView(float DeltaTime, FMinimalViewInfo& DesiredV
 
 第三人称游戏,通常会在玩家角色蓝图上添加CameraComponent,引擎会优先使用角色下的相机作为ViewTarget.
 
-![](UE4Camera/CameraForPawn.png)
+![](UECamera/CameraForPawn.png)
 
 CameraComponent并不是以Character作为父节点,而是以SpringArmComponent作为父节点.
 
-![](UE4Camera/SpringArmComponent.png)
+## Spring Arm Component
+
+![](UECamera/SpringArmComponent.png)
 
 这个组件的作用是将子节点固定在父节点的相对位置,当玩家行走,控制转向时,作为子节点的CameraComponent会跟随着移动转向.
 
@@ -89,7 +91,7 @@ APlayerController::SetViewTarget(class AActor* NewViewTarget, struct FViewTarget
 }
 ```
 
-![](UE4Camera/SetVIewTarget.png)
+![](UECamera/SetVIewTarget.png)
 
 为了让切镜不突兀,UE也预设了一些切换时的Blend效果:
 
@@ -141,7 +143,7 @@ class APlayerCameraManager : public AActor
 
 从PlayerCameraManager的定义来看,PlayerCameraManager决定了观察游戏世界最终的视角是怎样的,除了提供接口用于切换镜头,摄像机效果如震镜,镜头特效也是在其中处理,其更新最终ViewTarget的堆栈如下:
 
-![](UE4Camera/UpdateStack.png)
+![](UECamera/UpdateStack.png)
 
 在UWorld中的所有Actor的Tick逻辑执行完毕后,引擎才会驱动PlayerController->PlayerCameraManager更新ViewTarget.
 
@@ -161,5 +163,5 @@ APlayerCameraManager::UpdateViewTarget()
 ```
 
 这些效果也可以在合适的时机用蓝图或者C++代码添加.
-![](UE4Camera/CameraShakeAndLensEffect.png)
+![](UECamera/CameraShakeAndLensEffect.png)
 

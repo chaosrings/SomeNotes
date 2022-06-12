@@ -16,7 +16,7 @@ AnimationBP类似于Unity中的Animator,主要功能就是用状态机的形式�
 
 ### EventGraph
 
-![](UE4Animation/AnimBP_EventGraph.png)
+![](UEAnimation/AnimBP_EventGraph.png)
 
 初始工程角色的动画蓝图中EventGraph每帧都会从Pawn的Movement组件中获取角色移动状态，并根据这些状态的数值来设置动画蓝图中的预设变量(Variables).可以理解为根据游戏逻辑设置动画蓝图的参数，AnimationGraph中的状态机就会根据这些变量选取合适的动画进行播放.
 
@@ -26,22 +26,22 @@ AnimationBP类似于Unity中的Animator,主要功能就是用状态机的形式�
 
 最简单的AnimationGraph，一个状态机决定最终播放的动画
 
-![](UE4Animation/AnimBP_AnimationGraph_General.png)
+![](UEAnimation/AnimBP_AnimationGraph_General.png)
 
 
 展开状态机,可以看到状态机中状态的切换规则
 
-![](UE4Animation/AnimBP_AnimationGraph_StateMachine.png)
+![](UEAnimation/AnimBP_AnimationGraph_StateMachine.png)
 
 每个State都会输出一个动画,如何输出也可以自定义蓝图来实现.
 
 Idle/Run这个状态的输出动画,就是用EventGraph中设置的Speed变量对多个动画进行融合:
 
-![](UE4Animation/AnimBP_AnimationGraph_StateDetail.png)
+![](UEAnimation/AnimBP_AnimationGraph_StateDetail.png)
 
 除了State可以用蓝图来定义输出,State间的Transition条件也可以用蓝图来描述:
 
-![](UE4Animation/AnimBP_AnimationGraph_TransitionDetail.png)
+![](UEAnimation/AnimBP_AnimationGraph_TransitionDetail.png)
 
 可以用两个变量的异或值来决定是否切换状态.
 
@@ -51,7 +51,7 @@ Idle/Run这个状态的输出动画,就是用EventGraph中设置的Speed变量�
 
 如果只使用状态机,可能会这样实现:
 
-![](UE4Animation/AnimBP_Skill.png)
+![](UEAnimation/AnimBP_Skill.png)
 
 在Variables中添加变量Skill,分别用Skill=1,Skill=2,Skill=3进入对应的状态播放技能动画.实际上应该也有项目是这样做的)
 
@@ -59,7 +59,7 @@ Idle/Run这个状态的输出动画,就是用EventGraph中设置的Speed变量�
 
 AnimationGraph中的蒙太奇插槽就很好的解决了这个问题.
 
-![](UE4Animation/AnimBP_AnimationGraph_General.png)
+![](UEAnimation/AnimBP_AnimationGraph_General.png)
 
 StateMachine和OutputPose中的节点就是蒙太奇插槽,'DefaultSlot'是插槽的命名,是可以自定义的.正常情况可以认为这个节点不存在,此时
 
@@ -77,7 +77,7 @@ OutputPose = Slot'DefaultSlot' Animation
 
 AnimMontage则是由一个或多个动画片段组成,一个简单的蒙太奇示例:
 
-![](UE4Animation/AnimBP_AnimMontage.png)
+![](UEAnimation/AnimBP_AnimMontage.png)
 
 大致可以分为三个部分:
 
