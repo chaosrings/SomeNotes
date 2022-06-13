@@ -15,11 +15,11 @@ mathjax: true
 
 一种为角色朝向输入方向运动,大部分自由视角的游戏都是这种操作模式.
 
-<video class="ztext-gif GifPlayer-gif2mp4 css-1xeqk96" src="https://vdn3.vzuu.com/SD/c6c0258a-33a7-11ec-a88b-ee4e20c75e8c.mp4?disable_local_cache=1&amp;bu=078babd7&amp;c=avc.0.0&amp;f=mp4&amp;expiration=1655133505&amp;auth_key=1655133505-0-0-c7ac80e56ad73dd275667679295f41d3&amp;v=tx&amp;pu=078babd7" data-thumbnail="https://pic3.zhimg.com/v2-5cc3f977fe8757fcbc6b904cde98089a_b.jpg" poster="https://pic3.zhimg.com/v2-5cc3f977fe8757fcbc6b904cde98089a_b.jpg" data-size="normal" preload="metadata" loop="" playsinline=""></video>
+<video src='UEController/LookInput.mp4' type='video/mp4' controls='controls'  width='50%' height='50%'> </video>
 
 一种为角色朝向相机的八方向运动,锁定敌人的情况下会是这种操作模式(艾尔登法环,黑暗之魂的锁定系统).
 
-<video class="ztext-gif GifPlayer-gif2mp4 css-1xeqk96" src="https://vdn1.vzuu.com/SD/0c8c2542-33a7-11ec-9a5d-c2cfa79caada.mp4?disable_local_cache=1&amp;bu=078babd7&amp;c=avc.0.0&amp;f=mp4&amp;expiration=1655133505&amp;auth_key=1655133505-0-0-5df8cc50f1d838eae9f0e1664ef623e9&amp;v=hw&amp;pu=078babd7" data-thumbnail="https://pic2.zhimg.com/v2-99aaa1c7e754832d49c216dcb93c9db5_b.jpg" poster="https://pic2.zhimg.com/v2-99aaa1c7e754832d49c216dcb93c9db5_b.jpg" data-size="normal" preload="metadata" loop="" playsinline=""></video>
+<video src='UEController/LookCamera.mp4' type='video/mp4' controls='controls'  width='50%' height='50%'> </video>
 
 而无论角色朝向相机与否,角色的移动总是基于相机方向进行.
 
