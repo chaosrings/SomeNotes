@@ -67,7 +67,7 @@ ActorRotaion容易理解,无论是在第一人称还是第三人称的游戏中,
 
 图中箭头指向的方向可以用来标记这个朝向.
 
-ControlRotation的含义是什么呢?实际上就是视角的面向,在第三人称无锁定自由视角的操作模式下,玩家角色的面向与视角的面向在大部分时候并不一致,玩家可以自由控制视角的面向,玩家可以只转动视角让角色正对着屏幕,也能让角色背对屏幕,这个过程实际上就是改变了ControlRotation,并且让相机POV根据新的ControlRotation进行位置和旋转面向的调整:
+ControlRotation的含义是什么呢?实际上就是视角的面向,在第三人称无锁定自由视角的操作模式下,角色的面向与视角的面向在大部分时候并不一致,玩家可以自由控制视角的面向,只需要转动视角既能让角色正对着屏幕,也能让角色背对屏幕.这个过程实际上就是改变了ControlRotation,并且让相机POV根据新的ControlRotation进行位置和旋转面向的调整:
 
 ![](UEController/ControlRotation_F.png)
 ![](UEController/ControlRotation.png)
