@@ -1,5 +1,5 @@
 ---
-title: UE4Controller
+title: UEController
 date: 
 categories:
 - UnrealEngine
@@ -129,7 +129,7 @@ void APlayerController::UpdateRotation( float DeltaTime )
 
 在分析相机的文章中有提到过SpringArmComponent,在其Camera Settings的栏位中有UsePawnControlRotation,Inherit Pitch,Inherit Yaw,Inherit Roll四个属性,勾选这些选项后,子节点的相机就能根据鼠标的转动调整位置和朝向,为PlayerCameraManager提供合适的POV.
 
-![](UECamera/SpringArmComponent.png)
+![](UEController/SpringArmComponent.png)
 
 这些选项体现在代码中就是
 
