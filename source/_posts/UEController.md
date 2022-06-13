@@ -15,11 +15,11 @@ mathjax: true
 
 一种为角色朝向输入方向运动,大部分自由视角的游戏都是这种操作模式.
 
-<video src='UEController/LookInput.mp4' type='video/mp4' controls='controls'  width='50%' height='50%'> </video>
+<video src='https://github.com/chaosrings/chaosrings.github.io/blob/master/2022/06/12/UEController/LookInput.mp4?raw=true' type='video/mp4' controls='controls'  width='50%' height='50%'> </video>
 
 一种为角色朝向相机的八方向运动,锁定敌人的情况下会是这种操作模式(艾尔登法环,黑暗之魂的锁定系统).
 
-<video src='UEController/LookCamera.mp4' type='video/mp4' controls='controls'  width='50%' height='50%'> </video>
+<video src='https://github.com/chaosrings/chaosrings.github.io/blob/master/2022/06/12/UEController/LookCamera.mp4?raw=true' type='video/mp4' controls='controls'  width='50%' height='50%'> </video>
 
 而无论角色朝向相机与否,角色的移动总是基于相机方向进行.
 
