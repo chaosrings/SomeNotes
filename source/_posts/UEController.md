@@ -33,6 +33,8 @@ mathjax: true
 
 与PlayerController相对的是AIController,两者都继承自Controller.
 
+![](UEController/DeriveUML.png)
+
 ``` mermaid
 classDiagram
 class AController{
