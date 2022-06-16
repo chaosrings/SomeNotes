@@ -9,11 +9,11 @@ mathjax: true
 
 ACT常有攻击动作后根据下一次输入时机和按键进行变招的设计,以游戏鬼泣5中的角色尼禄为例,普攻的时机不同会有不同的连招:
 
-<video src='UEACTCombo/ComboC.mp4' type='video/mp4' controls='controls'  width='50%' height='50%'> </video>
+<video src='https://github.com/chaosrings/chaosrings.github.io/blob/master/2022/06/14/UEACTCombo/ComboC.mp4?raw=true' type='video/mp4' controls='controls'  width='50%' height='50%'> </video>
 
 连续两次普攻后暂停一会再接四次普攻(Red QueenCombo C)
 
-<video src='UEACTCombo/ComboD.mp4' type='video/mp4' controls='controls'  width='50%' height='50%'> </video>
+<video src='https://github.com/chaosrings/chaosrings.github.io/blob/master/2022/06/14/UEACTCombo/ComboD.mp4?raw=true' type='video/mp4' controls='controls'  width='50%' height='50%'> </video>
 
 连续三次普通后暂停一会再接一次普通(Red QueenCombo D)
 
