@@ -69,6 +69,17 @@ BranchCombo2-->....
 树的每个节点则包含了攻击的动画,分支以及分支条件信息,在UE中的定义为:
 
 ```cpp
+//基础资源类,继承自UE的DataAsset用于序列化资源文件
+UCLASS(Abstract)
+class ACTGAME_API UACTDataItemBase : public UPrimaryDataAsset
+{
+	GENERATED_BODY()
+public:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Item)
+	FPrimaryAssetType ItemType;
+
+	virtual FPrimaryAssetId GetPrimaryAssetId() const override;
+};
 //连击树实际上只需要一个根节点
 UCLASS()
 class ACTGAME_API UACTComboTree : public UACTDataItemBase

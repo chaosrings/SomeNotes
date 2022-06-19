@@ -85,6 +85,8 @@ UE实现了UPrimaryDataAsset类提供了基本的序列化反序列化功能,基
 
 以连招W+W+LeftMouseButton为例,画出其执行逻辑,容易得出这是一个状态机模型.
 
+![](UEACTSkill/Mermaid_SkillFlow.png)
+
 ``` mermaid
 graph LR
 
@@ -243,7 +245,23 @@ public:
 };
 ```
 
-InitSkillMap其实就是用序列化成资源文件的SkillData填充SkillMap,逻辑比较简单就不再赘述.关键的逻辑在于OnKeyDown,每当有输入时,将触发SkillMap中所有技能序列的OnKeyDown,之后找到一个优先级最高并且已经输入完毕的技能释放:
+InitSkillMap其实就是用序列化成资源文件的SkillData填充SkillMap,逻辑较为简单:
+
+```cpp
+void UACTSkillComponent::InitSkillMap()
+{
+	UACTAssetManager& manager = UACTAssetManager::Get();
+	TArray<FPrimaryAssetId> skillAssetIds;
+	manager.GetPrimaryAssetIdList(manager.SkillType, skillAssetIds);
+	for (auto& id : skillAssetIds)
+	{
+		TObjectPtr<UACTSkillData> skillData = manager.GetPrimaryAssetObject<UACTSkillData>(id);
+		AddSkill(skillData);
+	}
+}
+```
+
+关键的逻辑在于OnKeyDown,每当有输入时,将触发SkillMap中所有技能序列的OnKeyDown,之后找到一个优先级最高并且已经输入完毕的技能释放:
 
 ```cpp
 void UACTSkillComponent::OnKeyDown(FKey& key)

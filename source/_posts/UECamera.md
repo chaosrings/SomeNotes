@@ -29,7 +29,7 @@ struct FMinimalViewInfo
 }
 ```
 
-在游戏世界中,POV可能会有多个,但只有一个POV会成为ViewTarget,也就是最终的虚拟相机属性.更直白的说法就是,我可以在游戏世界中架设多台相机,但最终渲染结果只会用其中一个相机的摄影结果展示给玩家,这个ViewTarget的定义如下:
+在游戏世界中,POV可能会有多个,但只有一个POV会成为ViewTarget,也就是最终的虚拟相机属性.更直白的说法就是,可以在游戏世界中架设多台相机,但最终渲染结果只会用其中一个相机的摄影结果展示给玩家,这个ViewTarget的定义如下:
 
 ```cpp
 struct FTViewTarget
@@ -44,7 +44,7 @@ struct FTViewTarget
 
 ![](UECamera/CameraComponent.png)
 
-CameraComponent提供了一个POV,一般而言作为ViewTarget的CameraComponent Location,Rotation,FOV等属性会直接传递给POV,可以看CameraComponet::GetCameraView()的实现:
+CameraComponent提供了一个POV,一般而言作为ViewTarget的CameraComponent Location,Rotation,FOV等属性会直接传递给POV,可以看引擎中对CameraComponet::GetCameraView()的实现:
 
 ```cpp
 void UCameraComponent::GetCameraView(float DeltaTime, FMinimalViewInfo& DesiredView)
