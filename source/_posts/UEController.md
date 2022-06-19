@@ -6,7 +6,7 @@ categories:
 mathjax: true
 ---
 
-分析现有的第一人称射击游戏可以发现,无论是早期的CS,Half-Life还是最近的使命召唤,战地.基本的操作模式不说有点相像只能说一模一样.玩家角色的面向永远跟随鼠标/控制器的旋转,移动基于视角的面向进行.
+分析现有的第一人称射击游戏可以发现,无论是早期的CS,Half-Life还是最近的使命召唤,战地.基本的操作模式几乎一样.玩家角色的面向永远跟随鼠标/控制器的旋转,移动基于视角的面向进行.
 
 ![](UEController/TTF.jpg)
 <center>泰坦陨落</center>
@@ -183,7 +183,7 @@ void USpringArmComponent::UpdateDesiredArmLocation(bool bDoTrace, bool bDoLocati
 
 ## CharacterMovement By ControlRotation
 
-前面提到过,人物的移动无论是在哪种操作模式下(包括第一人称),方向永远是相机的朝向,所以移动的逻辑也十分通用.
+前面提到过,人物的移动无论是在哪种操作模式下(包括第一人称),前进方向永远是相机的朝向,所以移动的逻辑也十分通用.
 
 ``` cpp
 void AACTCharacter::MoveForward(float val)
@@ -195,3 +195,100 @@ void AACTCharacter::MoveForward(float val)
 	AddMovementInput(YawRotation.Vector(), val);
 }
 ```
+
+AddmovementInput是引擎中提供的接口,每次AddMovementInput,经过多层跳转最终都会回到Pawn::Internal_AddMovementInput,累加输入的方向.
+
+```cpp
+void APawn::Internal_AddMovementInput(FVector WorldAccel, bool bForce /*=false*/)
+{
+	if (bForce || !IsMoveInputIgnored())
+	{
+		ControlInputVector += WorldAccel;
+	}
+}
+```
+
+每次UCharacterMovementComponent::TickComponent时,都会消耗掉当前帧累加的ControlInputVector(是不是很像生产者消费者模型?):
+
+```cpp
+UCharacterMovementComponent::TickComponent(...)
+{
+	...
+	InputVector = ConsumeInputVector();
+	...
+	//Client Owner端和Server端进行实际的移动操作
+	if (CharacterOwner->GetLocalRole() > ROLE_SimulatedProxy)
+	{
+		//Client Owner根据InputVector进行移动
+		if (CharacterOwner->IsLocallyControlled()||...)
+		{
+			ControlledCharacterMove(InputVector, DeltaTime);
+		}
+	}
+	else if (CharacterOwner->GetLocalRole() == ROLE_SimulatedProxy)
+	{
+		...
+		SimulatedTick(DeltaTime);
+	}
+}
+```
+
+UCharacterMovementComponent::ControlledCharacterMove会将InputVector映射到[0,MaxAcceleration]之间,用这个加速度本地预表现后再发送给Server端进行校验(PerformMovement是实际修改位置的逻辑):
+
+```cpp
+FVector UCharacterMovementComponent::ScaleInputAcceleration(const FVector& InputAcceleration) const
+{
+	return GetMaxAcceleration() * InputAcceleration.GetClampedToMaxSize(1.0f);
+}
+
+void UCharacterMovementComponent::ControlledCharacterMove(const FVector& InputVector, float DeltaSeconds)
+{
+	...
+	Acceleration = ScaleInputAcceleration(ConstrainInputAcceleration(InputVector));
+	if (CharacterOwner->GetLocalRole() == ROLE_Authority)
+	{
+		//权威端直接PerformMovement,这是实际修改位置的逻辑
+		PerformMovement(DeltaSeconds);
+	}
+	else if (CharacterOwner->GetLocalRole() == ROLE_AutonomousProxy && IsNetMode(NM_Client))
+	{
+		//否则预表现移动并保存本次Move(用于后续拉扯后前滚到最新帧),再发送给Server校验
+		ReplicateMoveToServer(DeltaSeconds, Acceleration);
+	}
+}
+```
+
+UCharacterMovementComponent::ReplicateMoveToServer写得实在太长,只能写个大概的理解了(忽略了为了节约带宽而写的逻辑...有点太复杂了):
+
+```cpp
+UCharacterMovementComponent::ReplicateMoveToServer(float DeltaTime, const FVector& NewAcceleration)
+{
+	//保存本次Move part1
+	FSavedMovePtr NewMovePtr = ClientData->CreateSavedMove();
+	NewMove->SetMoveFor(CharacterOwner, DeltaTime, NewAcceleration, *ClientData);
+	...
+	//Local预表现Move
+	Acceleration = NewMove->Acceleration.GetClampedToMaxSize(GetMaxAcceleration());
+	PerformMovement(NewMove->DeltaTime);
+	...
+	//保存本次Move part2
+	ClientData->SavedMoves.Push(NewMovePtr);
+	//发包让Server PerformMovement
+	CallServerMove(NewMove, OldMove.Get());
+}
+```
+
+UCharacterMovementComponent::CallServerMove会RPC调用Server的代码,忽略掉其他逻辑,最终也会在Server端用本次Move的加速度PerformMovement:
+CallServerMove->ServerMoveDual->(Client Call Server RPC)ServerMoveDual_Implementation->MoveAutonomous
+```cpp
+void UCharacterMovementComponent::MoveAutonomous(...)
+{
+	...
+	Acceleration = ConstrainInputAcceleration(NewAccel);
+	Acceleration = Acceleration.GetClampedToMaxSize(GetMaxAcceleration());
+	PerformMovement(DeltaTime);
+	...
+}
+```
+
+这也就是在联网模式下,一次输入所需要执行的逻辑.
