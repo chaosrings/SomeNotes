@@ -87,7 +87,7 @@ SmoothClientPosition_Interpolate会根据插值平滑的方式递减MeshTranslat
 
 总的来说是想实现这样的效果:
 
-<video src='https://github.com/chaosrings/SomeNotes/blob/master/source/_posts/UECharacterMovement/shadow.mp4?raw=true' type='video/mp4' controls='controls'  width='50%' height='50%'> </video>
+<video src='https://github.com/chaosrings/chaosrings.github.io/blob/master/2022/06/21/UECharacterMovement/shadow.mp4?raw=true' type='video/mp4' controls='controls'  width='50%' height='50%'> </video>
 
 ## PerformMovement
 
