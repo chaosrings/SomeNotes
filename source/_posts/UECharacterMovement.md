@@ -10,7 +10,6 @@ mathjax: true
 
 ## SimulateSmoothing
 
-
 ![](UECharacterMovement/SimulateCorrectStart.png)
 
 Simulate每次接收到Server的位置信息都需要平滑插值更新,UCharacterMovementComponent::SmoothCorrection在ENetworkSmoothingMode::Linear和ENetworkSmoothingMode::Exponential模式下直接设置Collider的位置和旋转并保存接收的新位置与旧位置的差量:
@@ -77,8 +76,8 @@ void UCharacterMovementComponent::SmoothClientPosition_UpdateVisuals()
     else if (NetworkSmoothingMode == ENetworkSmoothingMode::Exponential)
     {
         const FVector NewRelTranslation = UpdatedComponent->GetComponentToWorld().InverseTransformVectorNoScale(ClientData->MeshTranslationOffset) + CharacterOwner->GetBaseTranslationOffset();
-			const FQuat NewRelRotation = ClientData->MeshRotationOffset * CharacterOwner->GetBaseRotationOffset();
-			Mesh->SetRelativeLocationAndRotation(NewRelTranslation, NewRelRotation, false, nullptr, GetTeleportType());
+		const FQuat NewRelRotation = ClientData->MeshRotationOffset * CharacterOwner->GetBaseRotationOffset();
+		Mesh->SetRelativeLocationAndRotation(NewRelTranslation, NewRelRotation, false, nullptr, GetTeleportType());
     }
 }
 ```
@@ -87,7 +86,7 @@ SmoothClientPosition_Interpolate会根据插值平滑的方式递减MeshTranslat
 
 总的来说是想实现这样的效果:
 
-<video src='https://github.com/chaosrings/SomeNotes/blob/master/source/_posts/UECharacterMovement/shadow.mp4?raw=true' type='video/mp4' controls='controls'  width='50%' height='50%'> </video>
+<video src='https://github.com/chaosrings/chaosrings.github.io/blob/master/2022/06/21/UECharacterMovement/shadow.mp4?raw=true' type='video/mp4' controls='controls'  width='50%' height='50%'> </video>
 
 ## PerformMovement
 
