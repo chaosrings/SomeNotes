@@ -17,19 +17,19 @@ Simulate每次接收到Server的位置信息都需要平滑插值更新,UCharact
 ```cpp
 UCharacterMovementComponent::SmoothCorrection()
 {
-    ...
+    //...
     FVector NewToOldVector = (OldLocation - NewLocation);
-    ...
+    //...
     ClientData->MeshTranslationOffset = ClientData->MeshTranslationOffset + NewToOldVector;
     if (NetworkSmoothingMode == ENetworkSmoothingMode::Linear)
 	{
-		...
+        //...
         const FScopedPreventAttachedComponentMove PreventMeshMove(CharacterOwner->GetMesh());
 		UpdatedComponent->SetWorldLocation(NewLocation, false, nullptr, GetTeleportType());
 	}
 	else
 	{
-        ...
+        //...
         const FScopedPreventAttachedComponentMove PreventMeshMove(CharacterOwner->GetMesh());
 		UpdatedComponent->SetWorldLocationAndRotation(NewLocation, NewRotation, false, nullptr, GetTeleportType());
 	}
@@ -45,21 +45,25 @@ UCharacterMovementComponent::SmoothClientPosition则会用ClientData->MeshTransl
 ```cpp
 void UCharacterMovementComponent::SmoothClientPosition(float DeltaSeconds)
 {
-    ...
+    //...
+    //衰减OriginalMeshTranslationOffset
 	SmoothClientPosition_Interpolate(DeltaSeconds);
+    //根据OriginalMeshTranslationOffset调整Mesh位置
 	SmoothClientPosition_UpdateVisuals();
 }
 
 void UCharacterMovementComponent::SmoothClientPosition_Interpolate()
 {
-    ...
+    //...
     if (NetworkSmoothingMode == ENetworkSmoothingMode::Linear)
 	{
-        ...
+        //...
+        //线性衰减到0
         ClientData->MeshTranslationOffset = FMath::LerpStable(ClientData->OriginalMeshTranslationOffset, FVector::ZeroVector, LerpPercent);
     }
     else if (NetworkSmoothingMode == ENetworkSmoothingMode::Exponential)
     {
+        //指数衰减到0
         const float SmoothLocationTime = Velocity.IsZero() ? 0.5f*ClientData->SmoothNetUpdateTime : ClientData->SmoothNetUpdateTime;
         ClientData->MeshTranslationOffset = (ClientData->MeshTranslationOffset * (1.f - DeltaSeconds / SmoothLocationTime));
     }
@@ -67,7 +71,7 @@ void UCharacterMovementComponent::SmoothClientPosition_Interpolate()
 
 void UCharacterMovementComponent::SmoothClientPosition_UpdateVisuals()
 {
-    ...
+    //...
     if (NetworkSmoothingMode == ENetworkSmoothingMode::Linear)
     {
         const FVector NewRelLocation = ClientData->MeshRotationOffset.UnrotateVector(ClientData->MeshTranslationOffset) + CharacterOwner->GetBaseTranslationOffset();
