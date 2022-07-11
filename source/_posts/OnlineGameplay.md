@@ -42,6 +42,8 @@
 
 根据个人的经验,蓄力释放的技能使用服务器启动的方式是较为合适的,客户端RPC通知服务器开始蓄力,服务器RPC通知客户端释放技能的延时感受都会被融合在蓄力中.
 
+被动触发的技能通常也是使用服务器启动的方式来实现,服务器上触发被动技能后再通知客户端触发技能.
+
 ### 更复杂的模式
 
 实际的开发中仅使用上述模式并不能处理所有的Gameplay,Bungie在GDC [Halo中的联机Gameplay](https://www.youtube.com/watch?v=h47zZrqjgLc)中提到了一个无敌护盾的例子:
@@ -83,6 +85,6 @@
 
 ![](OnlineGameplay/BuffRemove.png)
 
-不过Unreal在GAS中对Gameplay Effect也进行了预表现:
+不过Unreal在GAS中对Gameplay Effect也进行了预表现,下面是前人对GAS联机模式的同步流程梳理:
 
 ![](OnlineGameplay/GASPredict.png)
