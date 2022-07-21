@@ -1,3 +1,10 @@
+---
+title: 联机GamePlay
+categories:
+- network
+tags:
+mathjax: true
+---
 # 联机GamePlay
 
 ## 技能
@@ -11,6 +18,7 @@
 联机模式下，技能就需要根据情况选择不同的处理模式：
 
 ### 本地预表现
+a
 
 技能的预表现与移动的预表现逻辑类似，先在本地客户端执行技能逻辑，再把释放技能的指令发送到权威服务器进行校验(对应Unreal Gameplay Ability System的GameplayAbility::NetExecutionPolicy::LocalPredicted).
 
