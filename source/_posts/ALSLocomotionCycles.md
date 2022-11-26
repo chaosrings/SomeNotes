@@ -2,7 +2,7 @@
 
 ![](ALSLocomotionCycles/LocomotionCyclesState.png)
 
-LocomotionCycles首先用StrideBlend(步幅),WalkRunBlend(走/跑)两个参数控制动画融合得到六方向移动循环动画,每个动画与UE内置的BlendSpace2D类似:
+LocomotionCycles首先用StrideBlend(步幅),WalkRunBlend(走/跑)两个参数控制动画融合(BlendSpace2D)得到六方向移动循环动画:
 
 ![](ALSLocomotionCycles/ALS_N_WalkRun_F_BlendSpace.png)
 ![](ALSLocomotionCycles/ALS_N_WalkRun_FL_BlendSpace.png)
