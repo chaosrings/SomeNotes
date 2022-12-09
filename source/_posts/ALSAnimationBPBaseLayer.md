@@ -9,7 +9,7 @@ ALS的动画蓝图部分逻辑划分十分清晰,从左到右被不同颜色的�
 
 基础动画的输出由全身动画BaseLayer,上半身叠加动画OverLayLayer以及静止动作BasePoses三个部分的输出混合得到.
 
-本文主要分析BaseLayer部分逻辑的实现,如下图:
+本文主要分析LayerBlending部分逻辑的实现,如下图:
 
 ![](ALSAnimationBlueprint/BaseLayer.png)
 
@@ -22,7 +22,7 @@ ALS的动画蓝图部分逻辑划分十分清晰,从左到右被不同颜色的�
 LocomotionCycles状态机实现了角色移动状态下的状态机.
 
 ![](ALSLocomotionCycles/ALS_N_WalkRun_F_BlendSpace.png) | ![](ALSLocomotionCycles/ALS_N_WalkRun_FL_BlendSpace.png)
----|---
+:---:|:---:
 |MoveFoward|MoveForwardLeft|
 
 ![](ALSLocomotionCycles/LocomotionCyclesState.png)
@@ -33,15 +33,17 @@ LocomotionCycles状态机实现了角色移动状态下的状态机.
 
 (N) CycleBlending这部分则是将生成的六方向移动动画缓存,并将前向移动的动画与冲刺动画融合,得到最终的(N)FMovement用于Directional States状态机.
 
-这里为什么是六方向移动循环动画而不是[前,后,左,右,左前,右前,左后,右后]八个方向的动画?实际上这里的LF(左前)移动动画是角色
+这里为什么是六方向移动循环动画[F,B,FL,BL,FR,BR]而不是[前,后,左,右,左前,右前,左后,右后]八个方向的动画?实际上这里的FL(左前)移动动画是角色胸口朝向左前的正左移动动画,同理BL,FR,BR也只是胸口朝向不同的正左正右的移动动画,实际的左前移动动画是F和FL融合而成.
 
 ## Directional States状态机
 
 ![](ALSLocomotionCycles/DirectionalStates.png)
 
+Directional States状态机是六个状态间的切换.与前面的六方向移动动画对应,这里的Move LF,Move RF,Move LB,Move RB也是胸口面朝不同方向的移动状态,真正的斜向移动动画则是在子层级进行动画融合来实现的.
+
 ### 状态构成
 
-以MoveF为例:
+以Move F为例:
 
 ![](ALSLocomotionCycles/MoveFState.png)
 
@@ -75,11 +77,15 @@ VelocityBlend=(0,0,0,1),MoveFState=cachedPos'(N) RF Movement'
 
 其他状态的构成与MoveF类似,不过为了左前移动<->右前移动,左后移动<->右后移动的切换自然,左右四个状态(LF,LB,RF,RB)的动画融合有一些变化:
 
-![](ALSLocomotionCycles/MoveLFState.png)
+![](ALSLocomotionCycles/MoveLFState.png)|![](ALSLocomotionCycles/MoveRBState.png)
+|:---:|:---:|
+|Move LF|Move RB|
 
-以MoveLF状态为例,MoveLF动画融合中VelocityBlend.R参数控制的动画是cachedPos '(N) RB Movement'而不是MoveF中的cachedPos '(N) RF Movement',这样设计的目的是从左前移动切换到右前移动时,状态机的切换路径不是MoveLF->MoveRF而是MoveLF->MoveRB->MoveRF.
+以MoveLF状态为例,MoveLF动画融合中VelocityBlend.R参数控制的动画是cachedPos '(N) RB Movement'而不是MoveF中的cachedPos '(N) RF Movement',与Move RB的动画融合完全一致.
 
-若是直接从MoveLF->MoveRF切换,人物的胸口朝向会瞬间切换(面向左前瞬切到面向右前)显得不自然.而MoveLF->MoveRB的切换过程中,胸口的面向不会发生变化,MoveRB->MoveRF的切换则会有一个缓慢过渡的过程.
+这样设计的目的是从左前移动切换到右前移动时,状态机的切换路径不是MoveLF->MoveRF而是MoveLF->MoveRB->MoveRF.
+
+若是直接从MoveLF->MoveRF切换,人物的胸口朝向会瞬间切换(面向左前瞬切到面向右前)显得不自然.而MoveLF->MoveRB的切换过程中,胸口的面向不会发生变化,MoveRB->MoveRF的切换则会有一个融合过渡的过程.
 
 ### 状态切换
 
@@ -116,7 +122,7 @@ LocomotionDetail会引用Locomotion Cycles的输出,并进一步叠加细节动�
 ![](ALSLocomotionDetail/RunStartState.png)
 
 ![](ALSLocomotionDetail/ALS_N_LocoDetail_Accel_F.png)|![](ALSLocomotionDetail/ALS_N_LocoDetail_Accel_L.png)
----|---
+|:---:|:---:|
 |ALS_N_LocoDetail_Accel_F|ALS_N_LocoDetail_Accel_L|
 
 ### 状态切换
@@ -180,7 +186,7 @@ Main Grounded States引用了(N) Locomotion States,(CLF) Locomotion States的输
 (N) Standing直接使用(N) Locomotion States状态机的输出,(CLF) Crouching LF使用(CLF) Locomotion States的输出:
 
 ![](ALSMainGroundedStates/NStanding.png)| ![](ALSMainGroundedStates/CLFCrouching.png)
----|---
+:---:|:---:
 |(N) Standing|(CLF) Crouching Left|
 
 (N)->(CLF) Transition播放站立到蹲下的动画,(CLF)->(N) Transition与之相反播放蹲下到恢复站立的动画:
@@ -225,3 +231,120 @@ LandMovement状态播放落地后进行了地面的运动的落地动画,需要�
 状态间的Transition则是依靠变量Movement State:
 
 ![](ALSMainMovmentStates/MovementStateTransition.png)
+
+## Base Poses
+
+![](ALSAnimationBlueprint/BasePoses.png)
+
+BasePoses的输出结果十分简单,就是站姿和蹲姿两个基准Idle动画的融合结果,主要是为了作为基准生成Additive动画参与LayerBlending.
+
+## Overlay States
+
+![](ALSOverlayStates/OverlayStates.png)
+
+Overlay States处理所有非Locomotion的动画效果,ALS预设实现了各种上半身动作,包括武器(枪/弓)的瞄准和射击以及搬运物体等动画.
+
+![](ALSOverlayStates/BoxState.png)
+
+Overlay States中简单的状态以Box(搬箱子)为例,这个状态根据[走/跑],[站姿/蹲姿],[地面行走/翻滚/爬墙]几个参数来融合动画,输出的结果对应图中黄色的骨骼,相对于BasePoses,只有上半身的骨骼有对应的变换.
+
+![](ALSOverlayStates/BowState.png)
+
+弓箭的状态机则稍微复杂一点,最外层还是会用[地面行走/翻滚/爬墙]来融合动画,但是地面行走的输入则变成了一个状态机,而不是简单的几个Pose融合.
+
+![](ALSOverlayStates/BowStateMachine.png)
+
+![](ALSOverlayStates/BowStateMachineReadyState.png)
+
+仔细分析这个状态机中状态的构成可以发现,这些状态的底层也是由[走/跑],[站姿/蹲姿]控制动画融合,与前面的Box是类似的.每个状态的Transition则主要依靠RotationMode是否为Aiming.
+
+![](ALSOverlayStates/BowStateMachineTransition.png)
+
+总的来说Overlay States作为叠加层,输出的动画可以理解为只有上半身的骨骼变换,下半身与BasePoses保持一致.
+
+## Layer Blending
+
+Layer Blending的工作是将BaseLayer与OverlayLayer进行融合,这里逻辑较多,可以分为四个部分来理解.
+
+###  Make Dynamic Additives
+
+![](ALSLayerBlending/MakeDynamicAdditives.png)
+
+第一部分是生成Additive动画,注意这里的Additive是BaseLayer-BasePose而不是OverlayLayer-BasePose.
+
+有些骨骼用MeshSpace比较好,有些用LocalSpace比较好,因此这里计算了两个部分:
+
+BaseAdditive(MS)=MakeDynamicAttiveInMeshSpace(BaseLayer-BasePose)
+
+BaseAdditive(LS)=MakeDynamicAttiveInLocalSpace(BaseLayer-BasePose)
+
+### Add Additives
+
+![](ALSLayerBlending/AddAdditivesLeg.png)
+
+![](ALSLayerBlending/AddAdditivesArm.png)
+
+
+第二部分是叠加Additive动画,侧重不同对6个部位进行了叠加(Legs,Pelvis,Spine,Head,ArmL,ArmR),这里只截取了Legs,ArmL.
+
+核心的思路是计算BaseLayer与BasePose的差值作为Additive动画,将之叠加到Overlay动画上.
+
+(根据前面对Overlay的分析,Overlay可以理解为有上半身动作的BasePose)
+
+Additive = BaseLayer - BasePose
+
+AddPose = Overlay + additiveFactor * Additive
+
+FinalPose = Blend(BaseLayer,AddPose,blendFactor)
+
+实现可能比较反直觉,常见的做法应该是计算Overlay与BasePose的差值,将之叠加到BaseLayer上.
+
+Additive = Overlay - BasePose
+
+FinalPose = BaseLayer + additiveFactor * Additive
+
+但是这样做的话,FinalPose只能是从Locomotion(additiveFactor=0)过渡到Locomotion+Overlay(additiveFactor=1).
+
+ALS的实现方式通过控制两个参数additiveFactor和blendFactor,FinalPose的取值可以是
+
+Overlay(additiveFactor=0,blendFactor=1)
+
+Locomotion(additiveFactor=any,blendFactor=0)
+
+Locomotion+Overlay(additiveFactor=1,blendFactor=1)
+
+亦或是三个极限情况的融合动画,相比之下更为灵活.
+
+(ps:Legs输出的Pose大部分情况是Locomotion+Overlay的全身动画,而不是只有腿部骨骼的动画...)
+
+![](ALSLayerBlending/AddAdditivesAnimCurves.png)
+
+叠加Additive动画的控制参数大多会取Overlay States中原始动画的Anim Curves数值.
+
+### Blend Per Bone
+
+![](ALSLayerBlending/BlendPerBone.png)
+
+前面叠加Additive动画的六个部分(Legs,Pelvis,Spine,Head,ArmL,ArmR)需要按骨骼混合,第一个节点Legs Blend Pelvis的设置:
+
+Name:pelvis Depth:0(第一根骨骼就混合到目标位置)
+
+Name:thigh_l Depth:-1(该骨骼及其子骨骼都不参与混合)
+
+Name:thigh_r Depth:-1(该骨骼及其子骨骼都不参与混合)
+
+weights[0]=1.0
+
+![](ALSLayerBlending/BlendPelvis.png)
+
+也就是混合Pelvis的子骨骼spine_01以及spine_01下的所有子骨骼,后续的按骨骼混合节点逻辑与之类似就不赘述了.
+
+### Blend Anim Curves
+
+![](ALSLayerBlending/BlendAnimCurves.png)
+
+最后一部分的Layered blend per bone不混合任何骨骼,只是用来融合Anim Curves,左边第一个节点的Curve Blend Option = Blend by Weight,Blend Weights = 1.0效果是BaseLayer与OverlayLayer共同决定AnimCurves的数值:
+
+Val(AnimCurves"1")=Val(AnimCurves"1"_inBaseLayer) + Val(AnimCurves"1"_inOverlayLayer)
+
+右边第二个节点Curve Blend Option = Override,Blend Weights = 1.0效果则是剔除掉前面进行分层叠加Additive动画对Anim Curves的影响,直接使用BaseLayer和OverlayLayer融合的结果.
