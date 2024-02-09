@@ -1,14 +1,42 @@
 ---
-title: UECharacterMovement
+title: UECharacterMovement_SimulateProxy
 date: 
 categories:
 - UnrealEngine
 mathjax: true
 ---
 
-# UECharacterMovement
+# UE引擎中模拟端的移动同步
 
-## SimulateSmoothing
+虚幻引擎中模拟端(也就是多人游戏中看到的除主角外的其他Actor)的移动同步主要分为两种,一种是没有物理模拟的Actor,玩家控制的Character通常就归于此类.还有一种需要进行物理模拟的Actor,像场景中可以踢飞的球就属于此类.
+
+无论是否需要进行物理模拟,都在Actor的RPC中收到服务器下发的权威位置信息:
+
+```cpp 
+//ActorReplication.cpp
+void AActor::OnRep_ReplicatedMovement()
+{
+    if (LocalRepMovement.bRepPhysics)
+    {
+        ...
+		PostNetReceivePhysicState();
+		
+    }
+    else
+    {
+        if (!RootComponent->GetAttachParent())
+		{
+			if (GetLocalRole() == ROLE_SimulatedProxy)
+			{
+                PostNetReceiveVelocity(LocalRepMovement.LinearVelocity);
+				PostNetReceiveLocationAndRotation();
+            }
+        }
+    }
+}
+```
+
+## 无物理模拟的移动同步
 
 ![](UECharacterMovement/SimulateCorrectStart.png)
 
