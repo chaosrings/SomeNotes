@@ -32,7 +32,7 @@ Actor同步后,Replicator进行属性同步
 
 以简单测试的数组为例:
 
-```
+```cpp
 USTRUCT(BlueprintType)
 struct FFireInfo
 {
@@ -54,7 +54,7 @@ class AUnrealCppTestCharacter : public ACharacter
 ```
 
 在DS的RPC实现中增加数组第二项的计数:
-```
+```cpp
 void AUnrealCppTestCharacter::DoFire_Implementation()
 {
     if (FireInfoArray.Num() > 1)
@@ -80,7 +80,7 @@ void AUnrealCppTestCharacter::DoFire_Implementation()
 
 接受Bunch后,先读取Handle:
 
-```
+```cpp
 
 bool FRepLayout::ReceiveProperties(
 	UActorChannel* OwningChannel,
@@ -103,7 +103,7 @@ bool FRepLayout::ReceiveProperties(
 
 找到对应的Cmd,也就是Cmds[46],判断为动态数组,进入数组的读取逻辑.
 
-```
+```cpp
 static bool ReceiveProperties_r(FReceivePropertiesSharedParams& Params, FReceivePropertiesStackParams& StackParams)
 {
     for (int32 CmdIndex = StackParams.CmdStart; CmdIndex < StackParams.CmdEnd; ++CmdIndex)
@@ -114,9 +114,9 @@ static bool ReceiveProperties_r(FReceivePropertiesSharedParams& Params, FReceive
         {
             if(ERepLayoutCmdType::DynamicArray == Cmd.Type)
             {
-                //定义StackParams CmdIndex + 1到Cmd.EndCmd - 1其实也就是结构体的成员数量
+                //定义StackParams CmdIndex + 1到Cmd.EndCmd - 1也就是结构体的成员数量
                 //这个例子中结构体有两个元素,所以是[47,49) 左闭右开
-                //LocalHandle为4,其实意思就是LocalHandle=1x2+2,变更数组中index=1的元素中的第二项
+                //LocalHandle为4,意思就是LocalHandle=1x2+2,变更数组中index=1的元素中的第二项
                 FReceivePropertiesStackParams ArrayStackParams{
     				nullptr,
     				nullptr,

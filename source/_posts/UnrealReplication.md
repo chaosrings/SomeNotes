@@ -1,11 +1,11 @@
 # UE Actor Replication 
 
-## UObject两种类型
+## 两种类型UObject
 
 静态:能直接从资源包中加载,如制作好的map,blueprint,CDO,客户端与DS都能通过一个路径或者索引到对应的静态资源
 动态:运行时动态生成的UObject.
 
-```
+```cpp
 bool FNetGUIDCache::IsDynamicObject( const UObject* Object )
 {
 	// Any non net addressable object is dynamic
@@ -19,7 +19,7 @@ bool UObject::IsNameStableForNetworking() const
 
 在NetGuid中也有对两种类型的区分,静态为奇数,动态资源为偶数.
 
-```
+```cpp
 //NetworkGuid.h
 bool IsDynamic() const
 {
@@ -42,7 +42,7 @@ bool IsStatic() const
 ![](./UnrealReplication/ReplicateActor.png)
 
 关键函数是UPackageMapClient::SerializeNewActor
-```
+```cpp
 bool UPackageMapClient::SerializeNewActor(FArchive& Ar, class UActorChannel *Channel, class AActor*& Actor)
 {
     //OutBunch中序列化Actor
@@ -55,7 +55,7 @@ bool UPackageMapClient::SerializeNewActor(FArchive& Ar, class UActorChannel *Cha
 
 序列化时会先将UObject序列化到OutBunch,如果是静态UObject,在序列化Object时需要执行ExportNetGUID.
 
-```
+```cpp
 bool UPackageMapClient::SerializeObject( FArchive& Ar, UClass* Class, UObject*& Object, FNetworkGUID *OutNetGUID)
 {
     if (Ar.IsSaving())
@@ -71,7 +71,7 @@ bool UPackageMapClient::SerializeObject( FArchive& Ar, UClass* Class, UObject*& 
 ```
 
 ExportNetGUID会将静态资源的NetGUID,ExportFlags.bHasPath,ObjectPathName,NetworkChecksum等信息写入CurrentExportBunch:
-```
+```cpp
 bool UPackageMapClient::ExportNetGUID( FNetworkGUID NetGUID, UObject* Object, FString PathName, UObject* ObjOuter )
 {
     ...
@@ -93,7 +93,7 @@ void UPackageMapClient::InternalWriteObject(FArchive & Ar, FNetworkGUID NetGUID,
 
 如果是动态UObject就会序列化生成UObject需要的GetArchetype,Level,Transform等信息.
 
-```
+```cpp
 bool UPackageMapClient::SerializeNewActor(FArchive& Ar, class UActorChannel *Channel, class AActor*& Actor)
 {
     ...
@@ -117,13 +117,13 @@ bool UPackageMapClient::SerializeNewActor(FArchive& Ar, class UActorChannel *Cha
 
 NetConnection:ReceivedPacket,判断是否有已有Channel,没有的话需要创建
 
-```
+```cpp
 Channel = CreateChannelByName( Bunch.ChName, EChannelCreateFlags::None, Bunch.ChIndex );
 ```
 
 创建后使用此Channel读取和处理Bunch.
 
-```
+```cpp
 Channel->ReceivedRawBunch(Bunch, bLocalSkipAck);
 void UChannel::ReceivedRawBunch( FInBunch & Bunch, bool & bOutSkipAck )
 {
@@ -135,7 +135,7 @@ void UChannel::ReceivedRawBunch( FInBunch & Bunch, bool & bOutSkipAck )
 ```
 
 如果Bunch中有NetGUID相关数据,首先会处理NetGUID,创建NetGUID到CachedObject的Map:
-```
+```cpp
 void UPackageMapClient::ReceiveNetGUIDBunch( FInBunch &InBunch )
 {
     ...
@@ -148,7 +148,7 @@ void UPackageMapClient::ReceiveNetGUIDBunch( FInBunch &InBunch )
 ```
 
 服务器序列化UObject的函数SerializeObject向OutBunch写入NetGUID,ExportFlags,OuterObj,ObjectName等数据,InternalLoadObject实际上就是反过来从InBunch中读取的过程:
-```
+```cpp
 FNetworkGUID UPackageMapClient::InternalLoadObject( FArchive & Ar, UObject *& Object, const int32 InternalLoadObjectRecursionCount )
 {
     FNetworkGUID NetGUID;
@@ -170,7 +170,7 @@ FNetworkGUID UPackageMapClient::InternalLoadObject( FArchive & Ar, UObject *& Ob
 ```
 
 读取成功注册到Cahce中方便使用.
-```
+```cpp
 void FNetGUIDCache::RegisterNetGUIDFromPath_Client( const FNetworkGUID& NetGUID, const FString& PathName, const FNetworkGUID& OuterGUID, const uint32 NetworkChecksum, const bool bNoLoad, const bool bIgnoreWhenMissing )
 {
     ...
@@ -187,7 +187,7 @@ void FNetGUIDCache::RegisterNetGUIDFromPath_Client( const FNetworkGUID& NetGUID,
 GetObjectFromNetGUID会依次查找UPackageMapClient.ObjectLookup,全局UObject,磁盘加载,来找到对应的UObject.
 UPackage,CDO这种静态资源(NetGUID.IsStatic()),GetObjectFromNetGUID会直接得到对应的UObject.
 如果是动态创建的,那么就需要后续的SerializeNewActor,SerializeObject才会赋值.
-```
+```cpp
 UObject* FNetGUIDCache::GetObjectFromNetGUID( const FNetworkGUID& NetGUID, const bool bIgnoreMustBeMapped )
 {
     UObject* Object = CacheObjectPtr->Object.Get();
@@ -205,7 +205,7 @@ UObject* FNetGUIDCache::GetObjectFromNetGUID( const FNetworkGUID& NetGUID, const
 ```
 
 整批Bunch都读到可以提交时,会判断ActorChannel对应的Actor是否存在,如果不存在需要SerializeNewActor
-```
+```cpp
 UActorChannel::ProcessBunch(FInBunch & Bunch)
 {
     if( Actor == NULL )
@@ -218,7 +218,7 @@ UActorChannel::ProcessBunch(FInBunch & Bunch)
 
 SerializeNewActor会从Bunch中依次读取Actor的NetGUID,ArchetypeNetGUID,Location,Scale,Velocity,从World中Spawn后再注册到GuidCache中,其实也就是DS上调用SerializeNewActor的反序列化:
 
-```
+```cpp
 //Ar就是InBunch
 bool UPackageMapClient::SerializeNewActor(FArchive& Ar, class UActorChannel *Channel, class AActor*& Actor)
 {
@@ -250,7 +250,7 @@ bool UPackageMapClient::SerializeNewActor(FArchive& Ar, class UActorChannel *Cha
 
 动态生成的NetGUID会在RegisterNetGUID_Client最终将Object指针赋值.
 
-```
+```cpp
 void FNetGUIDCache::RegisterNetGUID_Client( const FNetworkGUID& NetGUID, const UObject* Object )
 {
     ...
