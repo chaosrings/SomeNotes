@@ -261,4 +261,18 @@ void FNetGUIDCache::RegisterNetGUID_Client( const FNetworkGUID& NetGUID, const U
 ```
 
 
+## 销毁过程
 
+这里描述普通情况(非NetDormancy,StreamLevel,ReplicationGraph),也就是DS上Actor销毁了,通知客户端同步销毁.
+
+- UWorld销毁Actor时通知NetDriver.
+- 如果NetDriver判断该Actor在当前NetDriver上同步
+- 遍历NetDriver上对所有的Connection,找到对应的ActorChannel,在此Channel上发送CloseBunch.
+
+服务器销毁:
+
+![](./UnrealReplication/ServerDestroy.png)
+
+客户端销毁:
+
+![](./UnrealReplication/ClientDestroy.png)

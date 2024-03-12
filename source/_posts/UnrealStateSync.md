@@ -1,22 +1,156 @@
 # UE 属性同步
 
-## RepLayoutCmd
+在ActorChannel将Actor序列化后,或者每次NetDriver的TickFlush,下一部分就是就是属性同步,对Actor的本体,以及Actor上的ActorComponent,Channel会依次调用ObjectReplicator::ReplicateProperties,将属性同步的内容写入OutBunch.
 
-Unreal为每个需要同步的类生成RepLayout,主要描述了所有需要同步的属性,RepParentCmd数组为最顶层的成员,RepLayoutCmd则是将属性完全展开扁平化后的描述.
+![](./UnrealStateSync/CallStack.png)
+
+
+## FObjectReplicator
+
+初始化过程:
+
+![](./UnrealStateSync/CreateReplicator.png)
+
+几个关键属性:
+
+![](./UnrealStateSync/Replicator.png)
+
+- ChangelistMgr 属性对比的关键结构,所有连接共享UObject的ChangeListMgr,在NetDriver这一层有缓存TMap< UObject*, FReplicationChangelistMgrWrapper >	ReplicationChangeListMap;
+- RepLayout 描述UObject同步变量的内存布局,每个类对应一个.
+- RepState 维护发送状态,Repliactor独有
+
+### ReplicationChangelistMgr
+
+ReplicationChangelistMgr是属性对比的关键类,结构如下:
+
+![](./UnrealStateSync/FReplicationChangelistMgr.png)
+
+属性对比过程就是在填充ChangeHistory:
+
+```cpp
+ERepLayoutResult FRepLayout::CompareProperties(
+	FSendingRepState* RESTRICT RepState,
+	FRepChangelistState* RESTRICT RepChangelistState,
+	const FConstRepObjectDataBuffer Data,
+	const FReplicationFlags& RepFlags) const
+{
+    RepChangelistState->CompareIndex++;
+    FRepChangedHistory& NewHistoryItem = RepChangelistState->ChangeHistory[HistoryIndex];
+    TArray<uint16>& Changed = NewHistoryItem.Changed;
+
+    ...
+    //属性对比
+    CompareParentProperties(SharedParams, StackParams);
+
+    // Move end pointer
+    RepChangelistState->HistoryEnd++;
+}
+```
+
+
+### RepLayout
+
+Unreal为每个需要同步的类生成RepLayout,主要描述了所有需要同步的属性,关键的是两个结构
+
+```cpp
+/** Top level Layout Commands. */
+TArray<FRepParentCmd> Parents;
+/** All Layout Commands. */
+TArray<FRepLayoutCmd> Cmds;
+```
+
+RepParentCmd数组为最顶层的成员,RepLayoutCmd则是将属性完全展开扁平化后的结果.
 
 - 如果需要同步的变量都是基础类型,那么RepParantCmd的数量与RepLayoutCmd的数量其实是一致的.
 - 如果需要同步的变量有结构体,或者动态数组,那么RepParentCmd需要对这些变量生成变化RepLayoutCmd.
 
 ![](./UnrealStateSync/RepLayoutCmd.png)
 
-## 同步时序
 
-Actor同步后,Replicator进行属性同步
+### RepState
 
-![](./UnrealStateSync/CallStack.png)
+RepState主要用于维护发送/接受状态.
+```cpp
+class FRepState : public FNoncopyable
+{
+    /** May be null on connections that don't receive properties. */
+    TUniquePtr<FReceivingRepState> ReceivingRepState;
+
+    /** May be null on connections that don't send properties. */
+    TUniquePtr<FSendingRepState> SendingRepState;
+}
+
+class FSendingRepState : public FNoncopyable
+{
+    /** Index in the buffer where changelist history starts (i.e., the Oldest changelist). */
+    int32 HistoryStart;
+    /** Index in the buffer where changelist history ends (i.e., the Newest changelist). */
+    int32 HistoryEnd;
+    /** Circular buffer of changelists. */
+    FRepChangedHistory ChangeHistory[MAX_CHANGE_HISTORY];
+    /**
+    * The last change list history item we replicated from FRepChangelistState.
+    * (If we are caught up to FRepChangelistState::HistoryEnd, there are no new changelists to replicate).
+    */
+    int32 LastChangelistIndex;
+}
+```
+
+FSendingRepState的结构看起来与FRepChangelistState有相似的地方,都是用一个环形队列来维护FRepChangedHistory,不过两者的作用并不相同.
+
+FSendingRepState.LastChangelistIndex记录了最近从FRepChangelistState.Changelist中同步Changed的下标，而FRepChangelistState.HistoryEnd记录了Changelist中最新Changed下标。
+
+因此```[FSendingRepState.LastChangelistIndex,FRepChangelistState.HistoryEnd)```就是这次需要发送的新产生Changed。
+
+```cpp
+bool FRepLayout::ReplicateProperties(...) const
+{
+    ...
+    // Gather all change lists that are new since we last looked, and merge them all together into a single CL
+    for (int32 i = RepState->LastChangelistIndex; i < RepChangelistState->HistoryEnd; ++i)
+    {
+    	const int32 HistoryIndex = i % FRepChangelistState::MAX_CHANGE_HISTORY;
+    	FRepChangedHistory& HistoryItem = RepChangelistState->ChangeHistory[HistoryIndex];
+    	TArray<uint16> Temp = MoveTemp(Changed);
+    	MergeChangeList(Data, HistoryItem.Changed, Temp, Changed);
+    }
+    RepState->LastChangelistIndex = RepChangelistState->HistoryEnd;
+}
+```
+
+当收集要发送的Changed后，会把它们存储于FSendingRepState.ChangeHistory中。
+
+![](./UnrealStateSync/ChangeListToRepState.png)
+
+为什么要存下来呢?一个作用是为了属性同步丢包时,将丢包的Handle合并到最新的Changed发送:
+
+```cpp
+void FRepLayout::UpdateChangelistHistory(
+	FSendingRepState* RepState,
+	UClass* ObjectClass,
+	const FConstRepObjectDataBuffer Data,
+	UNetConnection* Connection,
+	TArray<uint16>* OutMerged) const
+{
+    ...
+    for (int32 i = RepState->HistoryStart; i < RepState->HistoryEnd; i++)
+    {
+    	const int32 HistoryIndex = i % FSendingRepState::MAX_CHANGE_HISTORY;
+    	FRepChangedHistory& HistoryItem = RepState->ChangeHistory[HistoryIndex];
+        if (HistoryItem.Resend || bDumpHistory)
+        {
+			// Merge in nak'd change lists
+			TArray<uint16> Temp = MoveTemp(*OutMerged);
+			MergeChangeList(Data, HistoryItem.Changed, Temp, *OutMerged);
+        }
+    }
+}
+```
+
 
 ## 具体实现
 
+Server: CompareProperties_r
 
 ### 简单Property
 
