@@ -276,3 +276,10 @@ void FNetGUIDCache::RegisterNetGUID_Client( const FNetworkGUID& NetGUID, const U
 客户端销毁:
 
 ![](./UnrealReplication/ClientDestroy.png)
+
+## Character Spawn过程
+
+- GameMode处理NMT_Join,Spawn PlayerController(GameMode::Login)
+- PlayerController PostInitializeComponents中Spawn PlayerState
+- PlayerState初始化AbilitySystemComponent 设置同步
+- GameMode PostLogin中HandleStartingNewPlayer,RestartPlayerAtPlayerStart创建Default Pawn
