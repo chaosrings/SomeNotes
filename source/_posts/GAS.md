@@ -62,3 +62,33 @@ void UAbilitySystemComponent::ReadyForReplication()
 	}
 }
 ```
+
+# AbilityTask
+
+一个异步过程,ASC继承自UGameplayTasksComponent,其中维护TickingTasks,SimulatedTasks.其中SimulatedTasks会同步给Simulate端.(比如UAbilityTask_ApplyRootMotionConstantForce)
+
+UAbilityTask_PlayMontageAndWait播放Montage,LocalPredict如果被拒绝会停止播放蒙太奇.
+
+```cpp
+float UAbilitySystemComponent::PlayMontage(...)
+{
+	...
+	FPredictionKey PredictionKey = GetPredictionKeyForNewAction();
+	PredictionKey.NewRejectedDelegate().BindUObject(this, &UAbilitySystemComponent::OnPredictiveMontageRejected, NewAnimMontage);
+}
+
+
+void UAbilitySystemComponent::OnPredictiveMontageRejected(UAnimMontage* PredictiveMontage)
+{
+	...
+	UAnimInstance* AnimInstance = AbilityActorInfo.IsValid() ? AbilityActorInfo->GetAnimInstance() : nullptr;
+	if (AnimInstance && PredictiveMontage)
+	{
+		// If this montage is still playing: kill it
+		if (AnimInstance->Montage_IsPlaying(PredictiveMontage))
+		{
+			AnimInstance->Montage_Stop(MONTAGE_PREDICTION_REJECT_FADETIME, PredictiveMontage);
+		}
+	}
+}
+``````
