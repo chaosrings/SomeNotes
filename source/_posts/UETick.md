@@ -225,6 +225,8 @@ uint64 ProcessTasksNamedThread(int32 QueueIndex, bool bAllowStall)
 		if(!Task)
 		{
 			...
+			//如果没有Task了,会阻塞等待
+			Queue(QueueIndex).StallRestartEvent->Wait(bIsRenderThreadAndPolling ? GRenderThreadPollPeriodMs : MAX_uint32, bCountAsStall);
 		}
 		else
 		{
